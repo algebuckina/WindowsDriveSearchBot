@@ -1,4 +1,4 @@
-# Windows Drice Search Bot (Beta)
+# Windows Drive Search Bot (Beta)
 ## Overview
 
 A Godot‑based desktop search utility that indexes all local and network drives on the user's computer.
