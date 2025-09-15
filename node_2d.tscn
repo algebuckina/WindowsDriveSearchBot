@@ -1,0 +1,79 @@
+[gd_scene load_steps=4 format=3 uid="uid://dx5eg7r6t5jk"]
+
+[ext_resource type="Script" uid="uid://ddcntcohwsj0j" path="res://node_2d.gd" id="1_0hol4"]
+
+[sub_resource type="GDScript" id="GDScript_q6r6c"]
+script/source = "extends Button
+
+@onready var input_box = $\"../LineEdit\"
+@onready var output_box = $\"../RichTextLabel\"
+
+func _pressed():
+	var query = input_box.text.strip_edges().to_lower()
+	var results = []
+
+	var file_path = \"user://index.txt\"  # Or wherever your .bat file saves it
+	if FileAccess.file_exists(file_path):
+		var file = FileAccess.open(file_path, FileAccess.READ)
+		while not file.eof_reached():
+			var line = file.get_line()
+			if query in line.to_lower():
+				results.append(line)
+		file.close()
+
+		if results.size() > 0:
+			output_box.text = \"Found:\\n\" + \"\\n\".join(results)
+		else:
+			output_box.text = \"No matches found.\"
+	else:
+		output_box.text = \"Index file not found. Please run indexing first.\"
+"
+
+[sub_resource type="GDScript" id="GDScript_kdubu"]
+
+[node name="Node2D" type="Node2D"]
+script = ExtResource("1_0hol4")
+
+[node name="LineEdit" type="LineEdit" parent="."]
+offset_left = 297.0
+offset_top = 412.0
+offset_right = 622.0
+offset_bottom = 460.0
+placeholder_text = "  Search Files"
+
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
+offset_left = 298.0
+offset_top = 27.0
+offset_right = 617.0
+offset_bottom = 398.0
+focus_mode = 2
+text = "Textbox for secretary"
+threaded = true
+selection_enabled = true
+
+[node name="Button" type="Button" parent="."]
+offset_left = 163.0
+offset_top = 414.0
+offset_right = 282.0
+offset_bottom = 459.0
+tooltip_text = "Searches computer and indexed servers"
+text = "Search"
+script = SubResource("GDScript_q6r6c")
+
+[node name="Button3" type="Button" parent="."]
+offset_left = 22.0
+offset_top = 414.0
+offset_right = 140.0
+offset_bottom = 459.0
+tooltip_text = "Index's all connected servers (this may take some time)"
+text = "Index"
+script = SubResource("GDScript_kdubu")
+
+[node name="RichTextLabel2" type="RichTextLabel" parent="."]
+offset_left = 36.0
+offset_top = 20.0
+offset_right = 265.0
+offset_bottom = 71.0
+text = "Windows Mapped Drive
+ Index and Search Beta v0.1"
+horizontal_alignment = 1
