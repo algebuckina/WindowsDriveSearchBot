@@ -12,7 +12,7 @@ config_version=5
 
 config/name="searchbot"
 run/main_scene="uid://dx5eg7r6t5jk"
-config/features=PackedStringArray("4.4", "Forward Plus")
+config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
 
 [display]
