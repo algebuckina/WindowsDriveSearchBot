@@ -68,7 +68,8 @@ func _ready():
 	else:
 		results_display.clear()
 		results_display.append_text("No index file found, please click index before trying to search. Note, this will take some time.")
-		
+	
+	
 
 # Indexing logic — triggered when the Index Button is pressed
 func _on_index_button_pressed():
@@ -170,4 +171,5 @@ func _index_directory(path: String, file_list: Array):
 
 # Handle clicks on file links
 func _on_result_clicked(meta):
-	OS.shell_open(meta)  # Opens the file or folder using the default system app
+	var folder_path = meta.get_base_dir()
+	OS.shell_open(folder_path)
