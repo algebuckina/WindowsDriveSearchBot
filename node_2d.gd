@@ -151,6 +151,11 @@ func _index_directory(path: String, file_list: Array):
 
 		file_name = dir.get_next()
 	dir.list_dir_end()
+	
+
+func _unhandled_input(event):
+	if event is InputEventKey and event.pressed and event.keycode == KEY_ENTER:
+		_on_search_button_pressed()
 
 # Handle clicks on file links
 func _on_result_clicked(meta):
