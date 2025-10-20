@@ -4,6 +4,7 @@ extends Node2D
 
 # Stores all indexed file paths
 var indexed_paths: Array = []
+var index_thread := Thread.new()
 
 # Secretary-style "thinking" lines shown while searching
 var thinking_lines = [
@@ -71,13 +72,21 @@ func _ready():
 
 # Indexing logic — triggered when the Index Button is pressed
 func _on_index_button_pressed():
+	index_button.disabled = true
+	search_button.disabled = true
+	
 	var indexing = indexing_lines[randi() % indexing_lines.size()]
 	results_display.clear()
 	results_display.append_text(indexing + "\n\n")
 	
+	index_thread.start(_threaded_indexing)
+	
 	await get_tree().create_timer(1.5).timeout
 	
-	indexed_paths.clear()
+# miltithreaded indexing to stop software lag
+func _threaded_indexing():
+	
+	print("New thread opened")
 	
 	var target_dirs = [
 		"C:/", "D:/", "E:/","F:/", "G:/",
@@ -87,18 +96,25 @@ func _on_index_button_pressed():
 		"W:/", "X:/", "Y:/", "Z:/"
 	]
 	
+	indexed_paths.clear()
+	
 	for dir in target_dirs:
 		_index_directory(dir, indexed_paths)
-	
-	print("Indexing complete. Total files found: ", indexed_paths.size())
-	results_display.append_text("Indexing complete!")
-	
+		
 	# Save to index.txt
 	var file = FileAccess.open("user://index.txt", FileAccess.WRITE)
 	for path in indexed_paths:
 		file.store_line(path)
 	file.close()
 	print("Index saved to index.txt.")
+	
+	print("Indexing complete. Total files found: ", indexed_paths.size())
+	results_display.append_text("Indexing complete!")
+	
+	index_button.disabled = false
+	search_button.disabled = false
+	
+	print ("New Tread Closed")
 
 # Search logic — triggered when the Search Button is pressed
 func _on_search_button_pressed():
