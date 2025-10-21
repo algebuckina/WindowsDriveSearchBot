@@ -5,6 +5,7 @@ extends Node2D
 # Stores all indexed file paths
 var indexed_paths: Array = []
 var index_thread := Thread.new()
+var ctrl_held := false
 
 # Secretary-style "thinking" lines shown while searching
 var thinking_lines = [
@@ -52,6 +53,7 @@ func _ready():
 	index_button.pressed.connect(_on_index_button_pressed)
 	search_button.pressed.connect(_on_search_button_pressed)
 	results_display.meta_clicked.connect(_on_result_clicked)
+	search_input.text_submitted.connect(_on_search_button_entered)
 
 	# Load index.txt if it exists
 	var index_file_path = "user://index.txt"
@@ -68,8 +70,6 @@ func _ready():
 	else:
 		results_display.clear()
 		results_display.append_text("No index file found, please click index before trying to search. Note, this will take some time.")
-	
-	
 
 # Indexing logic — triggered when the Index Button is pressed
 func _on_index_button_pressed():
@@ -116,6 +116,9 @@ func _threaded_indexing():
 	search_button.disabled = false
 	
 	print ("New Tread Closed")
+
+func _on_search_button_entered(_submitted_text):
+	_on_search_button_pressed()
 
 # Search logic — triggered when the Search Button is pressed
 func _on_search_button_pressed():
@@ -169,12 +172,29 @@ func _index_directory(path: String, file_list: Array):
 		file_name = dir.get_next()
 	dir.list_dir_end()
 	
-
+# searches on enter
 func _unhandled_input(event):
 	if event is InputEventKey and event.pressed and event.keycode == KEY_ENTER:
 		_on_search_button_pressed()
 
 # Handle clicks on file links
-func _on_result_clicked(meta):
-	var folder_path = meta.get_base_dir()
-	OS.shell_open(folder_path)
+func _input(event):
+	if event is InputEventKey:
+		if event.keycode == KEY_CTRL:
+			ctrl_held = event.pressed
+
+# Handle clicks on file links
+func _on_result_clicked(meta):	
+	if ctrl_held:
+		var formatted_path = meta.replace("/", "\\") # makes all forward slashes backslashes to work with the cmd command
+		formatted_path = formatted_path.substr(0, 2) + formatted_path.substr(3) # removes extra backslash to work with command
+		
+		# Ctrl+Click: open folder and highlight file
+		var command = "explorer /select,\"" + formatted_path + "\""
+		print(command)
+		OS.execute("cmd", ["/C", command])
+		print("open folder")
+	else:
+		# Regular click: open the file
+		OS.shell_open(meta)
+		print("open file")
